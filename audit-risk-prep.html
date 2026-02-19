@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit & Risk Prep — Q4 2025</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: #F5F5F5;
+            color: #1a1a1a;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── Top Navigation Bar ── */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #fff;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .top-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hamburger {
+            width: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .hamburger span {
+            height: 2px;
+            background: #333;
+            border-radius: 1px;
+        }
+
+        .org-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .org-selector:hover { background: #F5F5F5; }
+
+        .org-icon {
+            width: 28px;
+            height: 28px;
+            background: #E8EFF7;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .org-icon svg { width: 16px; height: 16px; color: #5B7BA5; }
+
+        .org-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .chevron-down {
+            width: 12px;
+            height: 12px;
+            color: #999;
+        }
+
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-link {
+            font-size: 13px;
+            color: #555;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        .admin-link:hover { background: #F5F5F5; }
+
+        .nav-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            color: #555;
+        }
+        .nav-icon-btn:hover { background: #F5F5F5; }
+        .nav-icon-btn svg { width: 20px; height: 20px; }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            background: #EF4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── Left Sidebar ── */
+        .sidebar {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            width: 56px;
+            height: calc(100vh - 48px);
+            background: #fff;
+            border-right: 1px solid #E5E5E5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            z-index: 90;
+        }
+
+        .sidebar-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #E53935, #D32F2F);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .sidebar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #888;
+            transition: all 0.15s;
+        }
+        .sidebar-icon:hover { background: #F0F0F0; color: #555; }
+        .sidebar-icon.active {
+            background: #EBF2FF;
+            color: #2563EB;
+        }
+        .sidebar-icon svg { width: 20px; height: 20px; }
+
+        .sidebar-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ── Main Content ── */
+        .main {
+            margin-left: 56px;
+            margin-top: 48px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 40px 60px;
+            height: calc(100vh - 48px);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { color: #2563EB; }
+        .breadcrumb .sep { color: #CCC; font-size: 11px; }
+        .breadcrumb .current { color: #999; }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: #2563EB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .btn-primary:hover { background: #1D4ED8; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid #E5E5E5;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #777;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+            position: relative;
+            bottom: -1px;
+        }
+        .tab:hover { color: #333; }
+        .tab.active {
+            color: #111;
+            font-weight: 600;
+            border-bottom-color: #2563EB;
+        }
+
+        /* Risk Summary Cards */
+        .risk-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .risk-card {
+            background: #fff;
+            border: 1px solid #E8E8E8;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .risk-card:hover {
+            border-color: #D0D0D0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .risk-card-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .risk-card-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+        .risk-card-value { color: #E53935; }
+
+        .risk-card-detail {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* AI Prep Assistant Card */
+        .ai-card {
+            background: #fff;
+            border: 1px solid #E8E8E8;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 32px;
+        }
+
+        .ai-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .ai-card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 4px;
+        }
+
+        .ai-card-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2563EB;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .ai-card-meta {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .suggested-questions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .suggested-q {
+            background: #F7F7F7;
+            border: 1px solid #EFEFEF;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .suggested-q:hover {
+            background: #F0F0FF;
+            border-color: #D0D0FF;
+        }
+
+        .consult-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #fff;
+            border: 1px solid #E0E0E0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .consult-btn:hover {
+            border-color: #BBB;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .consult-btn .sparkle { color: #8B5CF6; }
+
+        .consult-btn-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .consult-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            background: #fff;
+            border: 1px solid #E0E0E0;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            min-width: 200px;
+            z-index: 200;
+            overflow: hidden;
+        }
+        .consult-dropdown.open { display: block; }
+
+        .consult-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+        .consult-dropdown-item:hover {
+            background: #EEF2FF;
+            color: #2563EB;
+        }
+        .consult-dropdown-item:hover svg { color: #2563EB; }
+        .consult-dropdown-item svg { color: #8B5CF6; flex-shrink: 0; transition: color 0.12s; }
+
+        /* Top Flagged Items */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .view-all {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563EB;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .view-all:hover { color: #1D4ED8; }
+
+        .flagged-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .flagged-item {
+            background: #fff;
+            border: 1px solid #E8E8E8;
+            border-radius: 12px;
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .flagged-item:hover {
+            border-color: #D0D0D0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .flagged-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .flagged-item-title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .severity-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: white;
+        }
+        .severity-badge.high { background: #E53935; }
+        .severity-badge.medium { background: #F59E0B; }
+        .severity-badge.low { background: #22C55E; }
+
+        .flagged-item-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .view-details {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563EB;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .view-details:hover { color: #1D4ED8; }
+
+        .flagged-item-desc {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .flagged-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .meta-tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .meta-tag svg { width: 14px; height: 14px; color: #BBB; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .risk-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Top Navigation ── -->
+<nav class="top-nav">
+    <div class="top-nav-left">
+        <div class="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="org-selector">
+            <div class="org-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
+            <span class="org-name">Vandelay Industries</span>
+            <svg class="chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+    </div>
+    <div class="top-nav-right">
+        <a href="#" class="admin-link">
+            Open administrator view
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </a>
+        <div class="nav-icon-btn" onclick="window.location.href='audit-risk-document.html'" style="cursor:pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="nav-icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="nav-icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="notification-badge">5</span>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Left Sidebar ── -->
+<aside class="sidebar">
+    <div class="sidebar-logo">D</div>
+    <div class="sidebar-nav">
+        <div class="sidebar-icon" title="Documents" onclick="window.location.href='audit-risk-document.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="sidebar-icon active" title="Calendar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="sidebar-icon" title="AI Agent" onclick="window.location.href='audit-risk-chat.html'" style="color:#8B5CF6;">
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L14.1 8.6L21 9.2L15.8 13.4L17.4 20.2L12 16.8L6.6 20.2L8.2 13.4L3 9.2L9.9 8.6L12 2Z" fill="#8B5CF6"/><path d="M5 3L5.7 5.3L8 5.5L6.2 7L6.8 9.3L5 8L3.2 9.3L3.8 7L2 5.5L4.3 5.3L5 3Z" fill="#8B5CF6" opacity="0.6"/><path d="M19 14L19.5 15.7L21.2 15.8L20 16.9L20.4 18.6L19 17.7L17.6 18.6L18 16.9L16.8 15.8L18.5 15.7L19 14Z" fill="#8B5CF6" opacity="0.6"/></svg>
+        </div>
+        <div class="sidebar-icon" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        </div>
+        <div class="sidebar-icon" title="Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="sidebar-icon" title="Reports">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="sidebar-icon" title="Team">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="sidebar-icon" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+    </div>
+</aside>
+
+<!-- ── Main Content ── -->
+<main class="main">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="#">Calendar</a>
+        <span class="sep">›</span>
+        <a href="#">Audit & Risk Prep</a>
+        <span class="sep">›</span>
+        <span class="current">Q4 2025 Review</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Audit & Risk Prep — Q4 2025</h1>
+            <p class="page-subtitle">Audit Committee Meeting · February 18, 2026 at 2:00 PM ET</p>
+        </div>
+        <button class="btn-primary">View Full Report</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active">Overview</div>
+        <div class="tab">Flagged Items</div>
+        <div class="tab">Documents</div>
+        <div class="tab">Notes</div>
+    </div>
+
+    <!-- Risk Summary Cards -->
+    <div class="risk-cards">
+        <div class="risk-card">
+            <div class="risk-card-label">Finance Risks</div>
+            <div class="risk-card-value red">7</div>
+            <div class="risk-card-detail">3 critical</div>
+        </div>
+        <div class="risk-card">
+            <div class="risk-card-label">Operational Risks</div>
+            <div class="risk-card-value red">5</div>
+            <div class="risk-card-detail">2 high, 1 medium</div>
+        </div>
+        <div class="risk-card">
+            <div class="risk-card-label">Compliance Flags</div>
+            <div class="risk-card-value">3</div>
+            <div class="risk-card-detail">3 high, 1 medium</div>
+        </div>
+        <div class="risk-card">
+            <div class="risk-card-label">Fraud Indicators</div>
+            <div class="risk-card-value">2</div>
+            <div class="risk-card-detail">Under investigation</div>
+        </div>
+    </div>
+
+    <!-- AI Prep Assistant -->
+    <div class="ai-card">
+        <div class="ai-card-header">
+            <div>
+                <div class="ai-card-title">AI Prep Assistant</div>
+                <div class="ai-card-label">Suggested Questions</div>
+            </div>
+            <div class="ai-card-meta">Analyzing 8 documents (347 pages)</div>
+        </div>
+
+        <div class="suggested-questions">
+            <div class="suggested-q">Can management explain the concentration of Q4 revenue in the final week and provide supporting documentation for the largest deals?</div>
+            <div class="suggested-q">What is the nature of the Vortex Partners relationship, and why wasn't it disclosed as a related party transaction?</div>
+            <div class="suggested-q">What is the timeline for remediating the IT access control deficiencies, and what compensating controls are in place?</div>
+        </div>
+
+        <div class="consult-btn-wrapper">
+            <button class="consult-btn" id="consultBtn">
+                <svg class="sparkle" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L14.1 8.6L21 9.2L15.8 13.4L17.4 20.2L12 16.8L6.6 20.2L8.2 13.4L3 9.2L9.9 8.6L12 2Z" fill="#8B5CF6"/><path d="M5 3L5.7 5.3L8 5.5L6.2 7L6.8 9.3L5 8L3.2 9.3L3.8 7L2 5.5L4.3 5.3L5 3Z" fill="#8B5CF6"/><path d="M19 14L19.5 15.7L21.2 15.8L20 16.9L20.4 18.6L19 17.7L17.6 18.6L18 16.9L16.8 15.8L18.5 15.7L19 14Z" fill="#8B5CF6"/></svg>
+                Consult a Risk Expert
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="consult-dropdown" id="consultDropdown">
+                <div class="consult-dropdown-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    Audit Expert
+                </div>
+                <div class="consult-dropdown-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    Risk Expert
+                </div>
+                <div class="consult-dropdown-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Cyber Expert
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Flagged Items -->
+    <div class="section-header">
+        <h2 class="section-title">Top Flagged Items</h2>
+        <a href="#" class="view-all">
+            View all 7 flags
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+    </div>
+
+    <div class="flagged-list">
+        <div class="flagged-item">
+            <div class="flagged-item-header">
+                <div class="flagged-item-title-row">
+                    <span class="severity-badge high">HIGH</span>
+                    <span class="flagged-item-title">Material Weakness: Revenue Recognition Controls</span>
+                </div>
+                <a href="#" class="view-details">
+                    View details
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </div>
+            <div class="flagged-item-desc">Controls over contract modification accounting under ASC 606 are not operating effectively. 3 of 10 sampled modifications lacked proper approval, 2 had incorrect revenue allocation totaling $2.4M.</div>
+            <div class="flagged-item-meta">
+                <span class="meta-tag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Internal Controls Assessment
+                </span>
+                <span class="meta-tag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    p. 16-18
+                </span>
+            </div>
+        </div>
+
+        <div class="flagged-item">
+            <div class="flagged-item-header">
+                <div class="flagged-item-title-row">
+                    <span class="severity-badge high">HIGH</span>
+                    <span class="flagged-item-title">IT General Controls: ERP Access Management Deficiencies</span>
+                </div>
+                <a href="#" class="view-details">
+                    View details
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </div>
+            <div class="flagged-item-desc">Segregation of duties violations found in new ERP. 8 users have conflicting access roles allowing both transaction initiation and approval. No provisioning reviews since go-live.</div>
+            <div class="flagged-item-meta">
+                <span class="meta-tag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Internal Controls Assessment
+                </span>
+                <span class="meta-tag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    p. 22-24
+                </span>
+            </div>
+        </div>
+
+        <div class="flagged-item">
+            <div class="flagged-item-header">
+                <div class="flagged-item-title-row">
+                    <span class="severity-badge medium">MEDIUM</span>
+                    <span class="flagged-item-title">Audit Recommendations: Cybersecurity Governance</span>
+                </div>
+                <a href="#" class="view-details">
+                    View details
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </div>
+            <div class="flagged-item-desc">External auditors recommended establishing a formal Cybersecurity Committee or expanding Audit Committee charter to include explicit cyber oversight responsibilities.</div>
+            <div class="flagged-item-meta">
+                <span class="meta-tag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    External Auditor Management Letter
+                </span>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+
+    // Sidebar icon switching
+    document.querySelectorAll('.sidebar-icon').forEach(icon => {
+        icon.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
+            icon.classList.add('active');
+        });
+    });
+
+    // Consult dropdown
+    const consultBtn = document.getElementById('consultBtn');
+    const consultDropdown = document.getElementById('consultDropdown');
+    consultBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        consultDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => {
+        consultDropdown.classList.remove('open');
+    });
+
+    // Dropdown item navigation
+    document.querySelectorAll('.consult-dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const expert = item.textContent.trim().replace(' Expert', '');
+            window.location.href = `audit-risk-chat.html?expert=${encodeURIComponent(expert)}`;
+        });
+    });
+
+    // Suggested question navigation
+    document.querySelectorAll('.suggested-q').forEach(q => {
+        q.addEventListener('click', () => {
+            window.location.href = `audit-risk-chat.html?q=${encodeURIComponent(q.textContent.trim())}`;
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q1 Materials — Document Viewer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: #F5F5F5;
+            color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── Top Nav ── */
+        .top-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 48px;
+            background: #fff;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .top-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #555;
+        }
+        .back-btn:hover { background: #F5F5F5; }
+        .back-btn svg { width: 18px; height: 18px; }
+
+        .doc-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-icon-btn {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #666;
+        }
+        .nav-icon-btn:hover { background: #F5F5F5; }
+        .nav-icon-btn svg { width: 18px; height: 18px; }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            background: #F0F0F0;
+            border-radius: 8px;
+            padding: 3px;
+            gap: 2px;
+            margin-left: 4px;
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .toggle-btn svg { width: 14px; height: 14px; }
+        .toggle-btn.active {
+            background: #fff;
+            color: #2563EB;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+            font-weight: 600;
+        }
+        .toggle-btn.active svg { color: #8B5CF6; }
+
+        /* ── Body Layout ── */
+        .body {
+            display: flex;
+            margin-top: 48px;
+            height: calc(100vh - 48px);
+            overflow: hidden;
+        }
+
+        /* ── Left Sidebar ── */
+        .sidebar {
+            width: 56px;
+            background: #fff;
+            border-right: 1px solid #E5E5E5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            flex-shrink: 0;
+            z-index: 90;
+        }
+
+        .sidebar-logo {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #E53935, #D32F2F);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-nav { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+
+        .sidebar-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #888; transition: all 0.15s;
+        }
+        .sidebar-icon:hover { background: #F0F0F0; color: #555; }
+        .sidebar-icon.active { background: #EBF2FF; color: #2563EB; }
+        .sidebar-icon svg { width: 20px; height: 20px; }
+
+        .sidebar-sparkle { color: #8B5CF6; }
+        .sidebar-sparkle:hover { background: #F3EEFF; color: #7C3AED; }
+
+        .sidebar-bottom { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+        /* ── Nav Panel ── */
+        .nav-panel {
+            width: 220px;
+            background: #fff;
+            border-right: 1px solid #E5E5E5;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .nav-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .nav-panel-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-panel-tab {
+            width: 30px; height: 30px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #888;
+        }
+        .nav-panel-tab.active { background: #EBF2FF; color: #2563EB; }
+        .nav-panel-tab svg { width: 16px; height: 16px; }
+
+        .nav-panel-close {
+            width: 24px; height: 24px;
+            border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #AAA;
+        }
+        .nav-panel-close:hover { background: #F5F5F5; color: #555; }
+        .nav-panel-close svg { width: 14px; height: 14px; }
+
+        .nav-panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #555;
+        }
+        .nav-item:hover { background: #F5F5F5; }
+        .nav-item.active { background: #EBF2FF; color: #2563EB; font-weight: 600; }
+        .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .nav-item-page { font-size: 11px; color: #BBB; margin-left: auto; }
+
+        /* ── Document Area ── */
+        .doc-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #E8E8E8;
+        }
+
+        .doc-scroll {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 24px 16px;
+        }
+
+        .doc-page {
+            background: #fff;
+            width: 100%;
+            max-width: 620px;
+            min-height: 700px;
+            border-radius: 4px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            padding: 56px 64px;
+            font-family: 'Times New Roman', Georgia, serif;
+            position: relative;
+        }
+
+        .doc-company {
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #333;
+            margin-bottom: 14px;
+        }
+
+        .doc-statement-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 6px;
+        }
+
+        .doc-period {
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 28px;
+        }
+
+        .doc-divider {
+            border: none;
+            border-top: 1.5px solid #222;
+            margin-bottom: 4px;
+        }
+        .doc-divider.thin { border-top-width: 0.5px; border-color: #888; margin-bottom: 16px; }
+
+        /* Financial table */
+        .fin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 24px;
+        }
+
+        .fin-table th {
+            text-align: right;
+            font-weight: 600;
+            font-size: 11px;
+            color: #333;
+            padding: 4px 8px;
+            border-bottom: 1px solid #333;
+        }
+        .fin-table th:first-child { text-align: left; }
+
+        .fin-table td {
+            padding: 5px 8px;
+            color: #222;
+            vertical-align: top;
+        }
+        .fin-table td:not(:first-child) { text-align: right; }
+
+        .fin-table tr.highlight td {
+            background: #FFF3CD;
+        }
+        .fin-table tr.total td {
+            font-weight: 700;
+            border-top: 1px solid #333;
+            border-bottom: 2px solid #333;
+        }
+
+        /* Annotation markers */
+        .marker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px; height: 16px;
+            background: #2563EB;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 3px;
+            font-family: -apple-system, sans-serif;
+            vertical-align: middle;
+            margin-left: 3px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: background 0.12s, transform 0.1s;
+        }
+        .marker:hover { background: #1D4ED8; transform: scale(1.15); }
+        .marker.active { background: #7C3AED; box-shadow: 0 0 0 2px #C4B5FD; }
+
+        .doc-note-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .doc-note-text {
+            font-size: 12px;
+            line-height: 1.75;
+            color: #333;
+        }
+
+        .doc-highlight {
+            background: #FFF9C4;
+            border-bottom: 1.5px solid #F59E0B;
+        }
+
+        /* Page nav */
+        .doc-page-nav {
+            height: 44px;
+            background: #fff;
+            border-top: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .page-nav-btn {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #666;
+        }
+        .page-nav-btn:hover { background: #F0F0F0; }
+        .page-nav-btn svg { width: 16px; height: 16px; }
+
+        .page-nav-info {
+            font-size: 13px;
+            color: #555;
+            font-family: -apple-system, sans-serif;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .page-nav-divider { width: 1px; height: 20px; background: #E5E5E5; }
+
+        .zoom-btn {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #666;
+        }
+        .zoom-btn:hover { background: #F0F0F0; }
+        .zoom-btn svg { width: 16px; height: 16px; }
+
+        /* ── AI Insights Panel ── */
+        .insights-panel {
+            width: 320px;
+            background: #fff;
+            border-left: 1px solid #E5E5E5;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .insights-header {
+            padding: 16px 18px 12px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .insights-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 10px;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+        }
+
+        .filter-chip {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #E5E5E5;
+            color: #666;
+            transition: all 0.12s;
+        }
+        .filter-chip:hover { border-color: #CCC; }
+        .filter-chip.active {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        .insights-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Insight groups */
+        .insight-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #F0F0F0;
+            border-radius: 6px;
+            transition: background 0.25s, padding 0.25s;
+        }
+        .insight-group:last-child { border-bottom: none; padding-bottom: 0; }
+        .insight-group.flash {
+            background: #EEF2FF;
+            padding: 12px;
+            margin: -12px;
+        }
+
+        .ref-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px; height: 18px;
+            background: #2563EB;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 4px;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+        .ref-badge.purple { background: #2563EB; }
+        .ref-badge.orange { background: #2563EB; }
+
+        .insight-group-header {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Insight card */
+        .insight-card {
+            border-left: 3px solid #2563EB;
+            padding-left: 12px;
+        }
+
+        .insight-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 6px;
+        }
+
+        .insight-card-quote {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* AI Expert section */
+        .expert-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .expert-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .expert-avatar {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E53935, #D32F2F);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .expert-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .expert-body {
+            font-size: 12px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .expert-body p { margin-bottom: 8px; }
+        .expert-body strong { font-weight: 600; color: #222; }
+
+        /* Suggested question */
+        .suggested-q-card {
+            background: #F7F7F7;
+            border: 1px solid #EFEFEF;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .suggested-q-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #999;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .suggested-q-text {
+            font-size: 13px;
+            line-height: 1.55;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .suggested-q-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sq-btn-primary {
+            flex: 1;
+            padding: 7px 12px;
+            background: #2563EB;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.12s;
+        }
+        .sq-btn-primary:hover { background: #1D4ED8; }
+
+        .sq-btn-secondary {
+            flex: 1;
+            padding: 7px 12px;
+            background: #fff;
+            color: #555;
+            border: 1px solid #E0E0E0;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.12s;
+        }
+        .sq-btn-secondary:hover { border-color: #CCC; background: #F5F5F5; }
+
+        /* Mini chat input */
+        .insights-input {
+            flex-shrink: 0;
+            padding: 0 18px 16px;
+        }
+
+        .gradient-divider {
+            height: 1px;
+            background: linear-gradient(90deg, #FF6B6B, #FF9F43, #54A0FF, #8B5CF6, #00D2D3);
+            margin-bottom: 14px;
+            opacity: 0.5;
+        }
+
+        .mini-input-box {
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            padding: 11px 14px 8px;
+            background: #FAFAFA;
+        }
+        .mini-input-box:focus-within { border-color: #C8C8C8; background: #fff; }
+
+        .mini-input-field {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            color: #333;
+            font-family: inherit;
+            outline: none;
+        }
+        .mini-input-field::placeholder { color: #C0C0C0; }
+
+        .mini-input-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .mini-input-left { display: flex; align-items: center; gap: 4px; }
+        .mini-input-right { display: flex; align-items: center; gap: 4px; }
+
+        .mini-pill-btn {
+            display: flex; align-items: center; gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer; color: #777;
+            font-size: 12px; font-weight: 500;
+        }
+        .mini-pill-btn:hover { background: #EFEFEF; }
+        .mini-pill-btn svg { width: 13px; height: 13px; }
+
+        .mini-send-btn {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #E8E8E8;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #AAA;
+        }
+        .mini-send-btn svg { width: 12px; height: 12px; }
+
+        .mini-disclaimer {
+            text-align: center;
+            font-size: 11px;
+            color: #C8C8C8;
+            margin-top: 8px;
+        }
+        .mini-disclaimer a { color: #AAA; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+    <div class="top-nav-left">
+        <div class="back-btn" onclick="window.location.href='audit-risk-prep.html'" title="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </div>
+        <span class="doc-title">Q1 Materials</span>
+    </div>
+    <div class="top-nav-right">
+        <div class="nav-icon-btn" title="Expand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        </div>
+        <div class="nav-icon-btn" title="Bookmarks">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div class="nav-icon-btn" title="More">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </div>
+        <div class="toggle-group">
+            <div class="toggle-btn active" id="toggleAI">
+                <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 2L14.1 8.6L21 9.2L15.8 13.4L17.4 20.2L12 16.8L6.6 20.2L8.2 13.4L3 9.2L9.9 8.6L12 2Z" fill="#8B5CF6"/></svg>
+                AI Agent
+            </div>
+            <div class="toggle-btn" id="toggleSearch">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Search
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Body -->
+<div class="body">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">D</div>
+        <div class="sidebar-nav">
+            <div class="sidebar-icon active" title="Documents" onclick="window.location.href='audit-risk-document.html'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Calendar" onclick="window.location.href='audit-risk-prep.html'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Filters">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            </div>
+            <div class="sidebar-icon sidebar-sparkle" title="AI Agent" onclick="window.location.href='audit-risk-chat.html'">
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L14.1 8.6L21 9.2L15.8 13.4L17.4 20.2L12 16.8L6.6 20.2L8.2 13.4L3 9.2L9.9 8.6L12 2Z" fill="#8B5CF6"/><path d="M5 3L5.7 5.3L8 5.5L6.2 7L6.8 9.3L5 8L3.2 9.3L3.8 7L2 5.5L4.3 5.3L5 3Z" fill="#8B5CF6" opacity="0.6"/><path d="M19 14L19.5 15.7L21.2 15.8L20 16.9L20.4 18.6L19 17.7L17.6 18.6L18 16.9L16.8 15.8L18.5 15.7L19 14Z" fill="#8B5CF6" opacity="0.6"/></svg>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <div class="sidebar-icon" title="Team">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Navigation Sub-panel -->
+    <div class="nav-panel" id="navPanel">
+        <div class="nav-panel-header">
+            <div class="nav-panel-tabs">
+                <div class="nav-panel-tab active" title="Navigation">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:#333;flex:1;padding-left:8px;">Navigation</div>
+            <div class="nav-panel-close" onclick="document.getElementById('navPanel').style.display='none'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </div>
+        </div>
+        <div class="nav-panel-body">
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Cover Page
+                <span class="nav-item-page">1</span>
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Table of Contents
+                <span class="nav-item-page">3</span>
+            </div>
+            <div class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                Financial Statements
+                <span class="nav-item-page">15</span>
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Notes to Financials
+                <span class="nav-item-page">42</span>
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Auditor Report
+                <span class="nav-item-page">78</span>
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Risk Disclosures
+                <span class="nav-item-page">94</span>
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Management Discussion
+                <span class="nav-item-page">108</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Content -->
+    <div class="doc-area">
+        <div class="doc-scroll">
+            <div class="doc-page">
+                <div class="doc-company">Acme Corporation</div>
+                <div class="doc-statement-title">Consolidated Statements of Operations</div>
+                <div class="doc-period">For the Quarter Ended March 31, 2026 (Unaudited)</div>
+                <hr class="doc-divider">
+                <hr class="doc-divider thin">
+
+                <table class="fin-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;font-style:italic;font-weight:400;color:#555;">(in thousands)</th>
+                            <th>Q1 2026</th>
+                            <th>Q4 2025</th>
+                            <th>Q1 2025</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Product Revenue</td>
+                            <td>$52,847</td>
+                            <td>$48,234</td>
+                            <td>$41,892</td>
+                        </tr>
+                        <tr>
+                            <td>Service Revenue</td>
+                            <td>$15,423</td>
+                            <td>$14,876</td>
+                            <td>$12,654</td>
+                        </tr>
+                        <tr class="total highlight">
+                            <td>Total Revenue <span class="marker" data-ref="1">1</span></td>
+                            <td>$68,270</td>
+                            <td>$63,110</td>
+                            <td>$54,546</td>
+                        </tr>
+                        <tr>
+                            <td>Cost of Goods Sold</td>
+                            <td>$38,456</td>
+                            <td>$36,892</td>
+                            <td>$32,127</td>
+                        </tr>
+                        <tr class="total">
+                            <td>Gross Profit</td>
+                            <td>$29,814</td>
+                            <td>$26,218</td>
+                            <td>$22,419</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="doc-note-title">Note 3: Revenue Recognition</div>
+                <div class="doc-note-text">
+                    <p>Revenue is recognized when control of the promised goods or services is transferred to the customer, in an amount that reflects the consideration the Company expects to be entitled to in exchange for those goods or services. <span class="doc-highlight">The Company recognized $12.4 million in product revenue during the final week of the quarter, representing approximately 18% of total quarterly revenue.<span class="marker" data-ref="2">2</span></span> This concentration was primarily driven by large enterprise deals with extended sales cycles that closed in the final days of the period.</p>
+                    <br>
+                    <p>Management has determined that this revenue concentration pattern, while elevated compared to historical norms of 8-10%, <span class="doc-highlight">reflects legitimate business activity and the timing of customer purchase decisions.<span class="marker" data-ref="3">3</span></span> The Company has reviewed the terms of these arrangements and confirmed that all revenue recognition criteria under ASC 606 have been met.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Navigation -->
+        <div class="doc-page-nav">
+            <div class="page-nav-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </div>
+            <span class="page-nav-info">15 / 116</span>
+            <div class="page-nav-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="page-nav-divider"></div>
+            <div class="zoom-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </div>
+            <div class="zoom-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </div>
+            <div class="zoom-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Insights Panel -->
+    <div class="insights-panel">
+        <div class="insights-header">
+            <div class="insights-title">AI Insights</div>
+            <div class="filter-chips">
+                <div class="filter-chip active">All</div>
+                <div class="filter-chip">Critical</div>
+                <div class="filter-chip">High</div>
+                <div class="filter-chip">Medium</div>
+            </div>
+        </div>
+
+        <div class="insights-body">
+
+            <!-- ── Reference 1: Total Revenue ── -->
+            <div class="insight-group" id="insight-1">
+                <div class="insight-group-header">
+                    <span class="ref-badge">1</span>
+                    <div class="insight-card-title" style="margin:0;">Total Revenue — Q1 2026 Growth Spike</div>
+                </div>
+                <div class="insight-card" style="border-color:#2563EB;">
+                    <div class="insight-card-quote">"Total Revenue of $68,270K in Q1 2026 represents an 8.2% increase over Q4 2025 and a 25.2% increase over Q1 2025."</div>
+                </div>
+                <div class="expert-section">
+                    <div class="expert-header">
+                        <div class="expert-avatar">D</div>
+                        <span class="expert-name">AI Audit Expert</span>
+                    </div>
+                    <div class="expert-body">
+                        <p>The sequential revenue growth of 8.2% is above the company's historical quarterly run-rate of 4–6%. Combined with the end-of-period concentration, this warrants additional scrutiny of the revenue composition.</p>
+                        <p><strong>Audit Insight:</strong> Compare the revenue mix between product and service lines across quarters to identify any unusual shifts in recognition timing or categorization.</p>
+                    </div>
+                </div>
+                <div class="suggested-q-card">
+                    <div class="suggested-q-label">Suggested Question</div>
+                    <div class="suggested-q-text">Can management explain the drivers of the 25% year-over-year revenue increase and provide a breakdown by product line and geography?</div>
+                    <div class="suggested-q-actions">
+                        <button class="sq-btn-primary">Add to Questions</button>
+                        <button class="sq-btn-secondary">Not Relevant</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Reference 2: 18% Final-Week Concentration ── -->
+            <div class="insight-group" id="insight-2">
+                <div class="insight-group-header">
+                    <span class="ref-badge purple">2</span>
+                    <div class="insight-card-title" style="margin:0;">Revenue Recognition Timing Anomaly</div>
+                </div>
+                <div class="insight-card" style="border-color:#2563EB;">
+                    <div class="insight-card-quote">"The Company recognized $12.4 million in product revenue during the final week of the quarter, representing approximately 18% of total quarterly revenue."</div>
+                </div>
+                <div class="expert-section">
+                    <div class="expert-header">
+                        <div class="expert-avatar">D</div>
+                        <span class="expert-name">AI Risk Expert</span>
+                    </div>
+                    <div class="expert-body">
+                        <p>This concentration is nearly double the historical norm (8–10%). Such patterns can indicate channel stuffing, premature recognition, or side agreements that affect the timing of revenue.</p>
+                        <p><strong>Risk Insight:</strong> End-of-period revenue spikes are a common indicator in financial statement fraud. Request customer confirmations and shipping documentation for deals closed in the final week.</p>
+                        <p><strong>Audit Insight:</strong> ASC 606 requires control transfer at recognition. Verify delivery dates, customer acceptance, and absence of side letter arrangements.</p>
+                    </div>
+                </div>
+                <div class="suggested-q-card">
+                    <div class="suggested-q-label">Suggested Question</div>
+                    <div class="suggested-q-text">Can management provide a detailed breakdown of the $12.4M in final-week revenue, including customer names, deal sizes, and the specific dates control transferred?</div>
+                    <div class="suggested-q-actions">
+                        <button class="sq-btn-primary">Add to Questions</button>
+                        <button class="sq-btn-secondary">Not Relevant</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Reference 3: Management Legitimacy Claim ── -->
+            <div class="insight-group" id="insight-3">
+                <div class="insight-group-header">
+                    <span class="ref-badge orange">3</span>
+                    <div class="insight-card-title" style="margin:0;">Management Self-Assessment: Limited Corroboration</div>
+                </div>
+                <div class="insight-card" style="border-color:#2563EB;">
+                    <div class="insight-card-quote">"Management has determined that this revenue concentration pattern reflects legitimate business activity and the timing of customer purchase decisions."</div>
+                </div>
+                <div class="expert-section">
+                    <div class="expert-header">
+                        <div class="expert-avatar">D</div>
+                        <span class="expert-name">AI Audit Expert</span>
+                    </div>
+                    <div class="expert-body">
+                        <p>Management's self-determination is not supported by independent third-party confirmation in this disclosure. The absence of corroborating evidence (shipping logs, customer sign-offs) is a yellow flag.</p>
+                        <p><strong>Audit Insight:</strong> Request the underlying deal documentation for the top 5 transactions by value closed in the final week. Look for side letters, extended return windows, or delivery uncertainty.</p>
+                    </div>
+                </div>
+                <div class="suggested-q-card">
+                    <div class="suggested-q-label">Suggested Question</div>
+                    <div class="suggested-q-text">What independent evidence has been reviewed to support management's conclusion that the final-week revenue meets ASC 606 control transfer criteria?</div>
+                    <div class="suggested-q-actions">
+                        <button class="sq-btn-primary">Add to Questions</button>
+                        <button class="sq-btn-secondary">Not Relevant</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Mini Chat Input -->
+        <div class="insights-input">
+            <div class="gradient-divider"></div>
+            <div class="mini-input-box">
+                <input class="mini-input-field" type="text" placeholder="Want to follow up something">
+                <div class="mini-input-actions">
+                    <div class="mini-input-left">
+                        <div class="mini-pill-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                        </div>
+                        <div class="mini-pill-btn">
+                            Tools
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="mini-input-right">
+                        <div class="mini-pill-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        </div>
+                        <button class="mini-send-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mini-disclaimer">AI-generated content may have inaccuracies. <a href="#">Learn more</a></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Filter chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+        });
+    });
+
+    // Toggle AI Agent / Search
+    const toggleAI = document.getElementById('toggleAI');
+    const toggleSearch = document.getElementById('toggleSearch');
+    toggleAI.addEventListener('click', () => {
+        toggleAI.classList.add('active');
+        toggleSearch.classList.remove('active');
+    });
+    toggleSearch.addEventListener('click', () => {
+        toggleSearch.classList.add('active');
+        toggleAI.classList.remove('active');
+    });
+
+    // Marker click → scroll + flash insight panel
+    const insightsBody = document.querySelector('.insights-body');
+    document.querySelectorAll('.marker').forEach(marker => {
+        marker.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const ref = marker.dataset.ref;
+            const target = document.getElementById(`insight-${ref}`);
+            if (!target) return;
+
+            // Clear active marker states
+            document.querySelectorAll('.marker').forEach(m => m.classList.remove('active'));
+            marker.classList.add('active');
+            setTimeout(() => marker.classList.remove('active'), 1000);
+
+            // Scroll insight into view within the panel
+            target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Flash highlight
+            target.classList.add('flash');
+            setTimeout(() => target.classList.remove('flash'), 900);
+        });
+    });
+
+    // Suggested question buttons
+    document.querySelectorAll('.sq-btn-primary').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.textContent = '✓ Added';
+            this.style.background = '#16A34A';
+            setTimeout(() => { this.textContent = 'Add to Questions'; this.style.background = ''; }, 1500);
+        });
+    });
+    // Keep old single-button handler but replace with querySelectorAll above
+</script>
+
+</body>
+</html>
