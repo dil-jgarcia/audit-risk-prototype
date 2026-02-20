@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proof — Know before you build</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            oklch(97.2% 0.010 85);
+      --bg-subtle:     oklch(93.5% 0.013 85);
+      --surface:       oklch(99%   0.005 85);
+      --border:        oklch(88%   0.014 85);
+      --border-strong: oklch(78%   0.016 85);
+
+      --text-1:        oklch(17%   0.014 85);
+      --text-2:        oklch(46%   0.014 85);
+      --text-3:        oklch(67%   0.012 85);
+
+      --green:         oklch(33%   0.120 145);
+      --green-mid:     oklch(50%   0.140 145);
+      --green-light:   oklch(85%   0.065 145);
+      --green-xlight:  oklch(94%   0.030 145);
+
+      --amber:         oklch(70%   0.160 55);
+      --amber-dark:    oklch(52%   0.175 50);
+
+      --red:           oklch(52%   0.200 25);
+      --red-light:     oklch(93%   0.040 25);
+
+      --blue-tint:     oklch(92%   0.030 250);
+      --blue-mid:      oklch(42%   0.150 250);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Instrument Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: oklch(97.2% 0.010 85 / 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(24px, 5vw, 96px);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: var(--text-1);
+      text-decoration: none;
+      letter-spacing: -0.025em;
+    }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-2);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text-1); }
+
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+
+    .btn-ghost { background: transparent; color: var(--text-2); }
+    .btn-ghost:hover { color: var(--text-1); background: var(--bg-subtle); }
+
+    .btn-primary {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 1px 3px oklch(17% 0.014 85 / 0.2);
+    }
+    .btn-primary:hover {
+      background: oklch(27% 0.115 145);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px oklch(17% 0.014 85 / 0.16);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-2);
+      border: 1px solid var(--border-strong);
+    }
+    .btn-outline:hover { border-color: var(--text-2); color: var(--text-1); }
+
+    .btn-white { background: white; color: var(--green); font-weight: 700; }
+    .btn-white:hover { background: oklch(97% 0.03 145); transform: translateY(-1px); }
+
+    .btn-lg { padding: 13px 26px; font-size: 0.9375rem; border-radius: 8px; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: clamp(80px, 10vw, 128px) clamp(24px, 5vw, 96px) 0;
+    }
+
+    .hero-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 64px;
+      align-items: end;
+    }
+
+    .hero-headline {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: clamp(3.25rem, 8.5vw, 6.5rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      color: var(--text-1);
+    }
+
+    .hero-headline em {
+      font-style: italic;
+      color: var(--green);
+    }
+
+    .hero-aside { padding-bottom: 0.2em; }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--text-2);
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+
+    .hero-ctas { display: flex; flex-direction: column; gap: 8px; }
+
+    .hero-note {
+      font-size: 0.75rem;
+      color: var(--text-3);
+      margin-top: 10px;
+    }
+
+    /* ── PRODUCT MOCKUP ── */
+    .mockup-wrap {
+      max-width: 1280px;
+      margin: 64px auto 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 2px 8px oklch(17% 0.014 85 / 0.05),
+        0 16px 48px oklch(17% 0.014 85 / 0.08);
+    }
+
+    .mockup-chrome {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chrome-dots { display: flex; gap: 5px; }
+    .chrome-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .chrome-dot:nth-child(1) { background: oklch(68% 0.20 24); }
+    .chrome-dot:nth-child(2) { background: oklch(76% 0.18 60); }
+    .chrome-dot:nth-child(3) { background: oklch(64% 0.20 140); }
+
+    .chrome-address {
+      flex: 1;
+      max-width: 380px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* App shell */
+    .app { background: var(--surface); }
+
+    .app-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .app-logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.025em;
+    }
+
+    .app-nav { display: flex; gap: 24px; }
+    .app-nav a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      text-decoration: none;
+    }
+    .app-nav a.active { color: var(--text-1); }
+
+    .app-upload {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--green);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 5px;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 192px 1fr;
+    }
+
+    /* Sidebar */
+    .app-sidebar {
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+
+    .sb-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      padding: 0 14px;
+      margin-bottom: 6px;
+    }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+    }
+    .sb-item.active { background: var(--green-xlight); }
+
+    .sb-thumb {
+      width: 28px;
+      height: 20px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      padding: 3px 4px;
+      overflow: hidden;
+    }
+
+    .sb-line { height: 2px; border-radius: 1px; background: var(--border-strong); }
+    .sb-item.active .sb-line { background: var(--green-mid); }
+
+    .sb-name { font-size: 12px; font-weight: 500; color: var(--text-1); }
+    .sb-meta { font-size: 10px; color: var(--text-3); }
+
+    .sb-badge {
+      font-size: 9px;
+      font-weight: 700;
+      background: oklch(90% 0.055 145);
+      color: var(--green-mid);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* Main content */
+    .app-main { padding: 22px 24px; }
+
+    .result-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .result-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.03em;
+    }
+
+    .result-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+    .complete-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--green-xlight);
+      border: 1px solid var(--green-light);
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green-mid);
+    }
+    .complete-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green-mid); }
+
+    .results-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr 264px;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .panel-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 12px;
+    }
+
+    /* Flow panel */
+    .flow { display: flex; flex-direction: column; gap: 5px; }
+
+    .flow-row { display: flex; align-items: center; gap: 4px; }
+
+    .flow-screen {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+    }
+
+    .fs-name { font-size: 10px; color: var(--text-2); font-weight: 500; }
+    .fs-pct {
+      font-size: 15px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      color: var(--text-1);
+    }
+    .fs-pct.drop { color: var(--red); }
+
+    .fs-bar { height: 3px; background: var(--green-light); border-radius: 100px; margin-top: 3px; overflow: hidden; }
+    .fs-fill { height: 100%; background: var(--green-mid); border-radius: 100px; }
+    .fs-fill.drop { background: var(--red); }
+
+    .flow-arrow { font-size: 10px; color: var(--text-3); flex-shrink: 0; }
+
+    /* Completion panel */
+    .big-pct {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 54px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      line-height: 1;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .big-pct-sub { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+
+    .delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green-mid);
+      background: var(--green-xlight);
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin: 8px 0 14px;
+    }
+
+    .funnel { display: flex; flex-direction: column; gap: 5px; }
+
+    .f-row { display: flex; align-items: center; gap: 7px; }
+    .f-name { font-size: 11px; color: var(--text-2); width: 62px; flex-shrink: 0; }
+    .f-track { flex: 1; height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .f-fill { height: 100%; background: var(--green-mid); border-radius: 100px; }
+    .f-fill.drop { background: var(--red); }
+    .f-val { font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-2); width: 28px; text-align: right; }
+    .f-val.drop { color: var(--red); }
+
+    /* Findings panel */
+    .finding {
+      display: flex;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .finding:last-child { border-bottom: none; }
+
+    .f-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); flex-shrink: 0; margin-top: 5px; }
+    .f-dot.crit { background: var(--red); }
+    .f-dot.good { background: var(--green-mid); }
+
+    .f-quote { font-size: 12px; color: var(--text-1); line-height: 1.4; }
+    .f-clips { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+
+    /* Sessions */
+    .sessions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .session {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      flex: 1;
+    }
+
+    .s-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .s-name { font-size: 12px; font-weight: 500; color: var(--text-1); }
+    .s-status { font-size: 10px; color: var(--text-3); }
+
+    .s-play {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .view-all {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green-mid);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── LOGOS ── */
+    .logos {
+      padding: 48px clamp(24px, 5vw, 96px);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logos-row {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logos-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    .logos-divider { width: 1px; height: 18px; background: var(--border-strong); flex-shrink: 0; }
+
+    .logos-names {
+      display: flex;
+      align-items: center;
+      gap: clamp(24px, 4vw, 64px);
+      flex-wrap: wrap;
+    }
+
+    .logo-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-3);
+      opacity: 0.55;
+    }
+
+    /* ── SHARED SECTION STYLES ── */
+    .section {
+      padding: clamp(80px, 10vw, 128px) clamp(24px, 5vw, 96px);
+    }
+
+    .section-inner { max-width: 1280px; margin: 0 auto; }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--green-mid);
+      margin-bottom: 14px;
+    }
+
+    .heading {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: clamp(2.25rem, 4vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      color: var(--text-1);
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 64px;
+    }
+
+    .step { background: var(--surface); padding: clamp(32px, 4vw, 52px); }
+
+    .step-num {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: clamp(3.5rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      color: var(--border-strong);
+      margin-bottom: 28px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .step-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-1);
+      margin-bottom: 10px;
+    }
+
+    .step-desc { font-size: 0.875rem; color: var(--text-2); line-height: 1.7; }
+
+    /* ── FEATURES ── */
+    .features-layout {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: clamp(48px, 8vw, 120px);
+      align-items: start;
+    }
+
+    .features-sticky {
+      position: sticky;
+      top: 80px;
+    }
+
+    .features-intro-sub {
+      font-size: 1rem;
+      color: var(--text-2);
+      line-height: 1.7;
+      margin-top: 16px;
+      max-width: 38ch;
+    }
+
+    .feat-list { display: flex; flex-direction: column; }
+
+    .feat-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .feat-row:first-child { border-top: 1px solid var(--border); }
+
+    .feat-name {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-1);
+      margin-bottom: 8px;
+    }
+
+    .feat-desc { font-size: 0.875rem; color: var(--text-2); line-height: 1.7; max-width: 55ch; }
+
+    .feat-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      align-self: start;
+    }
+    .tag-all   { background: var(--green-xlight);  color: var(--green); }
+    .tag-ai    { background: var(--blue-tint);      color: var(--blue-mid); }
+    .tag-panel { background: oklch(95% 0.03 55);    color: var(--amber-dark); }
+
+    /* ── STATS ── */
+    .stats-bg { background: var(--bg-subtle); }
+
+    .stats-cells {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .stat-cell { background: var(--surface); padding: 44px 36px; }
+
+    .stat-num {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: clamp(2.75rem, 5vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      color: var(--text-1);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 8px;
+    }
+
+    .stat-num sup { font-size: 0.52em; vertical-align: super; letter-spacing: 0; }
+
+    .stat-desc { font-size: 0.875rem; color: var(--text-2); line-height: 1.5; max-width: 22ch; }
+
+    /* ── TESTIMONIALS ── */
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      margin-top: 64px;
+    }
+
+    .testi-mark {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 4rem;
+      line-height: 0.65;
+      color: var(--green-light);
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .testi-quote {
+      font-size: 1rem;
+      color: var(--text-2);
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+    .testi-quote strong { color: var(--text-1); font-weight: 600; }
+
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .t-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .t-name { font-size: 0.875rem; font-weight: 600; color: var(--text-1); }
+    .t-role { font-size: 0.75rem; color: var(--text-3); margin-top: 1px; }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      align-items: start;
+      margin-top: 56px;
+    }
+
+    .p-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      background: var(--surface);
+    }
+
+    .p-card.featured {
+      border-color: var(--green);
+      background: var(--green-xlight);
+    }
+
+    .p-plan {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .p-hot {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: var(--green);
+      color: white;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    .p-price {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      color: var(--text-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .p-mo {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--text-3);
+      font-family: 'Instrument Sans', sans-serif;
+      letter-spacing: 0;
+    }
+
+    .p-desc { font-size: 0.875rem; color: var(--text-2); margin: 10px 0 20px; line-height: 1.5; }
+
+    .p-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .p-feat {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: var(--text-2);
+    }
+
+    .chk { color: var(--green-mid); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+    .dsh { color: var(--text-3); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+    .unavail { opacity: 0.45; }
+
+    /* ── CTA ── */
+    .cta-section { background: var(--green); }
+
+    .cta-row {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .cta-heading {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      color: white;
+    }
+
+    .cta-sub { font-size: 1rem; color: oklch(86% 0.06 145); margin-top: 12px; line-height: 1.65; max-width: 50ch; }
+    .cta-fine { font-size: 0.75rem; color: oklch(76% 0.08 145); margin-top: 10px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: clamp(64px, 8vw, 96px) clamp(24px, 5vw, 96px) 40px;
+    }
+
+    .footer-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr repeat(3, 1fr);
+      gap: 64px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .foot-logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-optical-sizing: auto;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.025em;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .foot-desc { font-size: 0.875rem; color: var(--text-2); line-height: 1.65; max-width: 30ch; }
+
+    .foot-col-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 16px;
+    }
+
+    .foot-links { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .foot-links a { font-size: 0.875rem; color: var(--text-2); text-decoration: none; transition: color 0.15s; }
+    .foot-links a:hover { color: var(--text-1); }
+
+    .foot-bottom {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .foot-copy { font-size: 0.75rem; color: var(--text-3); }
+
+    .foot-legal { display: flex; gap: 20px; }
+    .foot-legal a { font-size: 0.75rem; color: var(--text-3); text-decoration: none; }
+    .foot-legal a:hover { color: var(--text-2); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .d1 { transition-delay: 0.1s; }
+    .d2 { transition-delay: 0.2s; }
+    .d3 { transition-delay: 0.3s; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav-logo">Proof</a>
+  <ul class="nav-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">How it works</a></li>
+    <li><a href="#">Pricing</a></li>
+    <li><a href="#">Blog</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="#" class="btn btn-ghost">Sign in</a>
+    <a href="#" class="btn btn-primary">Start free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid">
+    <h1 class="hero-headline">
+      Know before<br><em>you build.</em>
+    </h1>
+    <div class="hero-aside">
+      <p class="hero-desc">Upload any prototype and get real feedback from your exact target users in hours — not weeks. No recruitment. No scheduling. No guessing.</p>
+      <div class="hero-ctas">
+        <a href="#" class="btn btn-primary btn-lg">Upload your prototype</a>
+        <a href="#" class="btn btn-outline btn-lg">See a sample report</a>
+      </div>
+      <p class="hero-note">Free for 3 tests · No credit card required</p>
+    </div>
+  </div>
+
+  <!-- PRODUCT UI MOCKUP -->
+  <div class="mockup-wrap">
+    <div class="mockup-chrome">
+      <div class="chrome-dots">
+        <div class="chrome-dot"></div>
+        <div class="chrome-dot"></div>
+        <div class="chrome-dot"></div>
+      </div>
+      <div class="chrome-address">
+        <svg width="9" height="11" viewBox="0 0 9 11" fill="none" style="flex-shrink:0">
+          <rect x="0.5" y="4" width="8" height="6.5" rx="1" stroke="currentColor" stroke-width="1"/>
+          <path d="M2 4V2.5a2.5 2.5 0 0 1 5 0V4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        proof.design/tests/checkout-v3/results
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- App top bar -->
+      <div class="app-bar">
+        <span class="app-logo">Proof</span>
+        <nav class="app-nav">
+          <a href="#">Tests</a>
+          <a href="#" class="active">Results</a>
+          <a href="#">Testers</a>
+          <a href="#">Reports</a>
+        </nav>
+        <button class="app-upload">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M5 1v5.5M2 3.5 5 1l3 2.5M1 8.5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Upload prototype
+        </button>
+      </div>
+
+      <!-- App body -->
+      <div class="app-layout">
+
+        <!-- Sidebar -->
+        <div class="app-sidebar">
+          <div class="sb-label" style="margin-bottom:10px;">Recent tests</div>
+
+          <div class="sb-item active">
+            <div class="sb-thumb">
+              <div class="sb-line" style="width:100%"></div>
+              <div class="sb-line" style="width:70%"></div>
+              <div class="sb-line" style="width:85%"></div>
+            </div>
+            <div>
+              <div class="sb-name">Checkout v3</div>
+              <div class="sb-meta">24 responses</div>
+            </div>
+            <span class="sb-badge">Live</span>
+          </div>
+
+          <div class="sb-item">
+            <div class="sb-thumb">
+              <div class="sb-line" style="width:90%"></div>
+              <div class="sb-line" style="width:60%"></div>
+              <div class="sb-line" style="width:75%"></div>
+            </div>
+            <div>
+              <div class="sb-name">Onboarding v2</div>
+              <div class="sb-meta">18 responses</div>
+            </div>
+          </div>
+
+          <div class="sb-item">
+            <div class="sb-thumb">
+              <div class="sb-line" style="width:100%"></div>
+              <div class="sb-line" style="width:50%"></div>
+              <div class="sb-line" style="width:80%"></div>
+            </div>
+            <div>
+              <div class="sb-name">Home redesign</div>
+              <div class="sb-meta">12 responses</div>
+            </div>
+          </div>
+
+          <div class="sb-item">
+            <div class="sb-thumb">
+              <div class="sb-line" style="width:80%"></div>
+              <div class="sb-line" style="width:65%"></div>
+              <div class="sb-line" style="width:90%"></div>
+            </div>
+            <div>
+              <div class="sb-name">Settings page</div>
+              <div class="sb-meta">Collecting…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main results -->
+        <div class="app-main">
+          <div class="result-header">
+            <div>
+              <div class="result-title">Checkout Flow v3</div>
+              <div class="result-meta">Figma prototype · 24 testers · Shared Feb 18</div>
+            </div>
+            <div class="complete-badge">
+              <div class="complete-dot"></div>
+              Test complete
+            </div>
+          </div>
+
+          <div class="results-panels">
+
+            <!-- Flow analysis -->
+            <div class="panel">
+              <div class="panel-label">Prototype flow</div>
+              <div class="flow">
+                <div class="flow-row">
+                  <div class="flow-screen">
+                    <div class="fs-name">Cart</div>
+                    <div class="fs-pct">96%</div>
+                    <div class="fs-bar"><div class="fs-fill" style="width:96%"></div></div>
+                  </div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-screen">
+                    <div class="fs-name">Address</div>
+                    <div class="fs-pct">82%</div>
+                    <div class="fs-bar"><div class="fs-fill" style="width:82%"></div></div>
+                  </div>
+                </div>
+                <div style="padding-left:20px; font-size:10px; color:var(--text-3); line-height:1;">↓</div>
+                <div class="flow-row">
+                  <div class="flow-screen">
+                    <div class="fs-name">Payment</div>
+                    <div class="fs-pct drop">52%</div>
+                    <div class="fs-bar"><div class="fs-fill drop" style="width:52%"></div></div>
+                  </div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-screen">
+                    <div class="fs-name">Confirmed</div>
+                    <div class="fs-pct">42%</div>
+                    <div class="fs-bar"><div class="fs-fill" style="width:42%"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task completion -->
+            <div class="panel">
+              <div class="panel-label">Task completion</div>
+              <div class="big-pct">78%</div>
+              <div class="big-pct-sub">of testers completed checkout</div>
+              <div class="delta">↑ 14pts vs v2</div>
+              <div class="funnel">
+                <div class="f-row">
+                  <span class="f-name">Started</span>
+                  <div class="f-track"><div class="f-fill" style="width:100%"></div></div>
+                  <span class="f-val">100%</span>
+                </div>
+                <div class="f-row">
+                  <span class="f-name">Cart</span>
+                  <div class="f-track"><div class="f-fill" style="width:96%"></div></div>
+                  <span class="f-val">96%</span>
+                </div>
+                <div class="f-row">
+                  <span class="f-name">Address</span>
+                  <div class="f-track"><div class="f-fill" style="width:82%"></div></div>
+                  <span class="f-val">82%</span>
+                </div>
+                <div class="f-row">
+                  <span class="f-name">Payment</span>
+                  <div class="f-track"><div class="f-fill drop" style="width:52%"></div></div>
+                  <span class="f-val drop">52%</span>
+                </div>
+                <div class="f-row">
+                  <span class="f-name">Complete</span>
+                  <div class="f-track"><div class="f-fill" style="width:78%"></div></div>
+                  <span class="f-val">78%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Key findings -->
+            <div class="panel">
+              <div class="panel-label">Key findings</div>
+              <div class="finding">
+                <div class="f-dot crit"></div>
+                <div>
+                  <div class="f-quote">"Couldn't find the promo code field"</div>
+                  <div class="f-clips">8 clips · High impact</div>
+                </div>
+              </div>
+              <div class="finding">
+                <div class="f-dot"></div>
+                <div>
+                  <div class="f-quote">"Wasn't sure which card was saved"</div>
+                  <div class="f-clips">5 clips · Medium impact</div>
+                </div>
+              </div>
+              <div class="finding">
+                <div class="f-dot good"></div>
+                <div>
+                  <div class="f-quote">"Address autofill was really smooth"</div>
+                  <div class="f-clips">12 clips · Positive</div>
+                </div>
+              </div>
+              <div class="finding">
+                <div class="f-dot"></div>
+                <div>
+                  <div class="f-quote">"Back button went to wrong step"</div>
+                  <div class="f-clips">3 clips · Low impact</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sessions -->
+          <div class="sessions">
+            <div class="session">
+              <div class="s-avatar" style="background:oklch(88% 0.07 145);color:var(--green)">SM</div>
+              <div>
+                <div class="s-name">Sarah M.</div>
+                <div class="s-status">Completed · 1m 52s</div>
+              </div>
+              <div class="s-play">
+                <svg width="7" height="8" viewBox="0 0 7 8" fill="none"><path d="M1.5 1.5l4 2.5-4 2.5V1.5z" fill="white"/></svg>
+              </div>
+            </div>
+            <div class="session">
+              <div class="s-avatar" style="background:oklch(93% 0.04 55);color:var(--amber-dark)">JK</div>
+              <div>
+                <div class="s-name">James K.</div>
+                <div class="s-status">Dropped · Payment</div>
+              </div>
+              <div class="s-play">
+                <svg width="7" height="8" viewBox="0 0 7 8" fill="none"><path d="M1.5 1.5l4 2.5-4 2.5V1.5z" fill="white"/></svg>
+              </div>
+            </div>
+            <div class="session">
+              <div class="s-avatar" style="background:var(--blue-tint);color:var(--blue-mid)">AW</div>
+              <div>
+                <div class="s-name">Alex W.</div>
+                <div class="s-status">Completed · 3m 07s</div>
+              </div>
+              <div class="s-play">
+                <svg width="7" height="8" viewBox="0 0 7 8" fill="none"><path d="M1.5 1.5l4 2.5-4 2.5V1.5z" fill="white"/></svg>
+              </div>
+            </div>
+            <div class="session">
+              <div class="s-avatar" style="background:var(--red-light);color:var(--red)">RL</div>
+              <div>
+                <div class="s-name">Rachel L.</div>
+                <div class="s-status">Dropped · Payment</div>
+              </div>
+              <div class="s-play">
+                <svg width="7" height="8" viewBox="0 0 7 8" fill="none"><path d="M1.5 1.5l4 2.5-4 2.5V1.5z" fill="white"/></svg>
+              </div>
+            </div>
+            <a href="#" class="view-all">View all 24 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOS -->
+<div class="logos reveal">
+  <div class="logos-row">
+    <span class="logos-label">Trusted by</span>
+    <div class="logos-divider"></div>
+    <div class="logos-names">
+      <span class="logo-name">Linear</span>
+      <span class="logo-name">Vercel</span>
+      <span class="logo-name">Loom</span>
+      <span class="logo-name">Intercom</span>
+      <span class="logo-name">Notion</span>
+      <span class="logo-name">Framer</span>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="reveal"><div class="eyebrow">How it works</div></div>
+    <h2 class="heading reveal d1" style="max-width:22ch">From prototype to insight in an afternoon.</h2>
+    <div class="steps reveal d2">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3 class="step-title">Upload your prototype</h3>
+        <p class="step-desc">Paste a Figma link, prototype URL, or upload a screen recording. We support rough wireframes through polished hi-fi flows. No dev work required.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3 class="step-title">We recruit the right testers</h3>
+        <p class="step-desc">Target by 40+ attributes — age, location, device, income, or industry. Our panel of 80,000+ screened participants gets you the right users in hours.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3 class="step-title">Read the results</h3>
+        <p class="step-desc">Watch session recordings, review click heatmaps, and read AI summaries that surface the most important findings — ranked by impact.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" style="background:var(--bg-subtle)">
+  <div class="section-inner">
+    <div class="features-layout">
+      <div class="features-sticky reveal">
+        <div class="eyebrow">Features</div>
+        <h2 class="heading">Built for designers who move fast.</h2>
+        <p class="features-intro-sub">Everything you need to validate design decisions — without a research ops team or a three-week timeline.</p>
+      </div>
+      <div class="feat-list reveal d1">
+        <div class="feat-row">
+          <div>
+            <div class="feat-name">Session recordings</div>
+            <p class="feat-desc">Watch every second of every session. Replay exactly what users saw, clicked, and said aloud. Filter by task outcome, completion time, or sentiment.</p>
+          </div>
+          <span class="feat-tag tag-all">All plans</span>
+        </div>
+        <div class="feat-row">
+          <div>
+            <div class="feat-name">Click heatmaps</div>
+            <p class="feat-desc">See where attention concentrates and where users rage-click or freeze. Aggregated from all sessions into a single, read-at-a-glance overlay.</p>
+          </div>
+          <span class="feat-tag tag-all">All plans</span>
+        </div>
+        <div class="feat-row">
+          <div>
+            <div class="feat-name">AI findings summary</div>
+            <p class="feat-desc">Skip the transcript grind. An AI model watches every session, groups similar moments into clips, and delivers a ranked list of friction points and strengths.</p>
+          </div>
+          <span class="feat-tag tag-ai">AI-powered</span>
+        </div>
+        <div class="feat-row">
+          <div>
+            <div class="feat-name">Precision recruiting</div>
+            <p class="feat-desc">Test with your actual target user. Filter by age, location, device type, income, industry, past behavior, and 35+ additional attributes.</p>
+          </div>
+          <span class="feat-tag tag-panel">80k+ panel</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="section stats-bg">
+  <div class="stats-cells reveal">
+    <div class="stat-cell">
+      <div class="stat-num">3<sup>h</sup></div>
+      <p class="stat-desc">Average time to first insight after uploading</p>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">80k<sup>+</sup></div>
+      <p class="stat-desc">Pre-screened testers ready in the panel</p>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">94<sup>%</sup></div>
+      <p class="stat-desc">Teams who report shipping with more confidence</p>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">12<sup>×</sup></div>
+      <p class="stat-desc">Faster than traditional moderated research</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="reveal"><div class="eyebrow">From the teams using it</div></div>
+    <h2 class="heading reveal d1">Trusted by designers who care about getting it right.</h2>
+    <div class="testi-grid">
+      <div class="reveal">
+        <span class="testi-mark">"</span>
+        <p class="testi-quote">We caught a critical checkout drop-off <strong>before it ever reached engineering.</strong> That one test saved us three weeks of rework. Proof is now part of every design review we run.</p>
+        <div class="testi-author">
+          <div class="t-avatar" style="background:oklch(88% 0.07 145);color:var(--green)">MP</div>
+          <div>
+            <div class="t-name">Maya Patel</div>
+            <div class="t-role">Lead Product Designer, Vercel</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal d1">
+        <span class="testi-mark">"</span>
+        <p class="testi-quote">I uploaded a 12-screen prototype and had <strong>a ranked list of friction points with supporting clips</strong> in under four hours. I've never gotten insights this fast from any other tool.</p>
+        <div class="testi-author">
+          <div class="t-avatar" style="background:var(--blue-tint);color:var(--blue-mid)">JC</div>
+          <div>
+            <div class="t-name">Jordan Chen</div>
+            <div class="t-role">UX Researcher, Intercom</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal d2">
+        <span class="testi-mark">"</span>
+        <p class="testi-quote">We're a two-person design team with no research budget. Proof gave us <strong>the rigor of a dedicated research practice</strong> without any of the overhead. It's changed how we make decisions.</p>
+        <div class="testi-author">
+          <div class="t-avatar" style="background:oklch(94% 0.04 55);color:var(--amber-dark)">SW</div>
+          <div>
+            <div class="t-name">Sam Wright</div>
+            <div class="t-role">Co-founder & Designer, Linear</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" style="background:var(--bg-subtle)">
+  <div class="section-inner">
+    <div class="reveal"><div class="eyebrow">Pricing</div></div>
+    <h2 class="heading reveal d1">Start free. No surprises.</h2>
+    <p class="reveal d2" style="color:var(--text-2);font-size:1rem;margin-top:8px">Every plan includes full panel access. No per-tester surcharges.</p>
+    <div class="pricing-grid reveal d1">
+
+      <div class="p-card">
+        <div class="p-plan">Starter</div>
+        <div class="p-price">$0 <span class="p-mo">/ month</span></div>
+        <p class="p-desc">For exploring Proof and running your first tests.</p>
+        <ul class="p-features">
+          <li class="p-feat"><span class="chk">✓</span> 3 tests per month</li>
+          <li class="p-feat"><span class="chk">✓</span> Up to 5 testers per test</li>
+          <li class="p-feat"><span class="chk">✓</span> Session recordings</li>
+          <li class="p-feat"><span class="chk">✓</span> Click heatmaps</li>
+          <li class="p-feat unavail"><span class="dsh">–</span> AI findings summary</li>
+          <li class="p-feat unavail"><span class="dsh">–</span> Advanced targeting</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width:100%;justify-content:center">Get started free</a>
+      </div>
+
+      <div class="p-card featured">
+        <div class="p-plan">Pro <span class="p-hot">Popular</span></div>
+        <div class="p-price">$79 <span class="p-mo">/ month</span></div>
+        <p class="p-desc">For designers and teams who test every sprint.</p>
+        <ul class="p-features">
+          <li class="p-feat"><span class="chk">✓</span> Unlimited tests</li>
+          <li class="p-feat"><span class="chk">✓</span> Up to 10 testers per test</li>
+          <li class="p-feat"><span class="chk">✓</span> Session recordings</li>
+          <li class="p-feat"><span class="chk">✓</span> Click heatmaps</li>
+          <li class="p-feat"><span class="chk">✓</span> AI findings summary</li>
+          <li class="p-feat"><span class="chk">✓</span> Advanced targeting (40+ filters)</li>
+        </ul>
+        <a href="#" class="btn btn-primary" style="width:100%;justify-content:center">Start Pro trial</a>
+      </div>
+
+      <div class="p-card">
+        <div class="p-plan">Team</div>
+        <div class="p-price">$249 <span class="p-mo">/ month</span></div>
+        <p class="p-desc">For product teams running research at scale.</p>
+        <ul class="p-features">
+          <li class="p-feat"><span class="chk">✓</span> Everything in Pro</li>
+          <li class="p-feat"><span class="chk">✓</span> Up to 10 seats</li>
+          <li class="p-feat"><span class="chk">✓</span> Shared test library</li>
+          <li class="p-feat"><span class="chk">✓</span> Custom screener questions</li>
+          <li class="p-feat"><span class="chk">✓</span> Jira & Notion integrations</li>
+          <li class="p-feat"><span class="chk">✓</span> Priority support</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width:100%;justify-content:center">Contact sales</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section cta-section">
+  <div class="cta-row reveal">
+    <div>
+      <h2 class="cta-heading">Stop shipping blind.</h2>
+      <p class="cta-sub">Upload your prototype today. Get user feedback before engineers write a single line of code.</p>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <a href="#" class="btn btn-white btn-lg">Upload your prototype</a>
+      <p class="cta-fine">Free for 3 tests · No credit card</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <a href="#" class="foot-logo">Proof</a>
+      <p class="foot-desc">Validate your designs with real users before you build. Fast, affordable prototype testing for product teams that care about getting it right.</p>
+    </div>
+    <div>
+      <div class="foot-col-title">Product</div>
+      <ul class="foot-links">
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Figma plugin</a></li>
+        <li><a href="#">Changelog</a></li>
+        <li><a href="#">Roadmap</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="foot-col-title">Company</div>
+      <ul class="foot-links">
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="foot-col-title">Resources</div>
+      <ul class="foot-links">
+        <li><a href="#">Documentation</a></li>
+        <li><a href="#">Templates</a></li>
+        <li><a href="#">Community</a></li>
+        <li><a href="#">System status</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span class="foot-copy">© 2025 Proof Design, Inc.</span>
+    <div class="foot-legal">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Security</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(
+    entries => entries.forEach(e => e.target.classList.toggle('visible', e.isIntersecting)),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
