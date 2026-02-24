@@ -461,21 +461,21 @@
 
     <div class="top-bar-title-wrapper">
         <div class="top-bar-title" id="titleBtn">
-            GovernAI Agent
+            AI Audit Expert
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
         </div>
         <div class="title-dropdown" id="titleDropdown">
             <div class="title-dropdown-item" data-expert="Audit">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                Audit Expert
+                AI Audit Expert
             </div>
             <div class="title-dropdown-item" data-expert="Risk">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                Risk Expert
+                AI Enterprise Risk Expert
             </div>
             <div class="title-dropdown-item" data-expert="Cyber">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Cyber Expert
+                AI Cyber Expert
             </div>
         </div>
     </div>
@@ -507,7 +507,7 @@
             <!-- Empty state (shown when no question) -->
             <div id="emptyState" style="display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:60px 24px;">
                 <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#E53935,#D32F2F);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:22px;margin:0 auto 20px;">D</div>
-                <div style="font-size:20px;font-weight:700;color:#111;margin-bottom:8px;">GovernAI Agent</div>
+                <div style="font-size:20px;font-weight:700;color:#111;margin-bottom:8px;" id="emptyTitle">AI Audit Expert</div>
                 <div style="font-size:14px;color:#999;max-width:360px;line-height:1.6;" id="emptySubtitle">Ask your Audit Expert anything about the board materials, risk flags, or financial disclosures.</div>
             </div>
 
@@ -519,7 +519,7 @@
                     <div class="user-avatar">SM</div>
                 </div>
                 <div class="msg-user-bubble" id="userQuestion">
-                    I noticed the revenue recognition pattern shows 18% of quarterly revenue in the final week. From a risk perspective, what red flags should I be looking for?
+                    Why did revenue recognition in the final two weeks of Q4 reach 23% of quarterly revenue when the 3-year historical norm is 8–10%? Can management provide signed contracts and delivery confirmations for the five largest Q4 deals?
                 </div>
             </div>
 
@@ -530,35 +530,31 @@
                     <span class="ai-name" id="expertLabel">AI Risk Expert</span>
                     <span class="ai-time">03:15 PM</span>
                 </div>
-                <div class="msg-ai-content">
-                    <p>This concentration pattern warrants careful scrutiny. In my experience analyzing financial statement fraud cases, end-of-period revenue spikes are among the most common indicators of potential manipulation. Here's what to look for:</p>
-                    <p><strong>Specific red flags to investigate:</strong></p>
+                <div class="msg-ai-content" id="aiResponseContent">
+                    <p>This is a significant anomaly requiring escalation. A 23% final-week concentration — nearly 3× the historical 8–10% norm — is one of the most reliable indicators of potential revenue manipulation. Here's what to focus on:</p>
+                    <p><strong>Key concerns requiring documentation:</strong></p>
                     <ol>
-                        <li><strong>Side Letter Arrangements:</strong> Look for verbal agreements or undocumented terms that could affect revenue timing (extended payment terms, right of return, contingent pricing)</li>
-                        <li><strong>Bill-and-hold transactions:</strong> Revenue recognized before shipment with product "held" for customer convenience. Check shipping logs against recognition dates.</li>
-                        <li><strong>Channel stuffing indicators:</strong> Unusual discounts, favorable return terms, or extended credit offered to push sales into the quarter.</li>
-                        <li><strong>Reversals in subsequent period:</strong> High credit memos or returns in early Q2.</li>
+                        <li><strong>Contract modifications:</strong> Request executed contracts for the five largest Q4 deals. Look for side letters or verbal terms not captured in the formal agreement.</li>
+                        <li><strong>Delivery confirmation:</strong> Verify the specific date control transferred under ASC 606 for each deal. Management's assertion is not a verified fact.</li>
+                        <li><strong>Return rights and acceptance clauses:</strong> Any deal with acceptance provisions or extended return windows may not qualify for Q4 recognition.</li>
+                        <li><strong>Q1 reversals:</strong> Ask internal audit to pull early Q1 credit memos. Channel stuffing typically shows up in subsequent-period reversals.</li>
                     </ol>
-                    <div class="related-context-title">Related context</div>
-                    <ul>
-                        <li>These actions were discussed under the Cyber Risk, Finance, and Legal agenda items.</li>
-                        <li>No completion status was recorded in the minutes.</li>
-                    </ul>
+                    <p>The SEC consistently flags quarter-end revenue spikes as a fraud indicator. Under Armour's $408M SEC settlement involved exactly this pattern.</p>
                 </div>
                 <div class="sources">
                     <div class="sources-label">Sources</div>
-                    <div class="sources-chips">
+                    <div class="sources-chips" id="sourcesChips">
                         <div class="source-chip">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            Q1 Financial Statements
+                            Q4 Financial Statements, p. 8
                         </div>
                         <div class="source-chip">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            Internal Audit Report
+                            Q4 Revenue Analysis Deck, p. 4
                         </div>
                         <div class="source-chip">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            Q4 2025 Meeting Minutes
+                            Internal Controls Assessment, p. 16
                         </div>
                     </div>
                 </div>
@@ -581,7 +577,7 @@
         <div class="input-section">
             <div class="gradient-divider"></div>
             <div class="input-box">
-                <textarea class="input-field" id="inputField" placeholder="Ask the Risk Expert about fraud indicators, anomalies, or investigation" rows="1"></textarea>
+                <textarea class="input-field" id="inputField" placeholder="Ask the Audit Expert about financial statements, controls, or fraud indicators…" rows="1"></textarea>
                 <div class="input-actions">
                     <div class="input-left">
                         <div class="input-pill-btn">
@@ -608,14 +604,60 @@
 </div>
 
 <script>
-    // Read URL params to customize the page
-    const params = new URLSearchParams(window.location.search);
-    const question = params.get('q');
-    let currentExpert = params.get('expert') || 'Audit';
+    // Per-expert Q&A content — questions match the home page suggested questions
+    const expertContent = {
+        Audit: {
+            question: 'Why did revenue recognition in the final two weeks of Q4 reach 23% of quarterly revenue when the 3-year historical norm is 8–10%? Can management provide signed contracts and delivery confirmations for the five largest Q4 deals?',
+            responseHtml: `<p>This is a significant anomaly requiring escalation. A 23% final-week concentration — nearly 3× the historical 8–10% norm — is one of the most reliable indicators of potential revenue manipulation. Here's what to focus on:</p>
+                    <p><strong>Key concerns requiring documentation:</strong></p>
+                    <ol>
+                        <li><strong>Contract modifications:</strong> Request executed contracts for the five largest Q4 deals. Look for side letters or verbal terms not captured in the formal agreement.</li>
+                        <li><strong>Delivery confirmation:</strong> Verify the specific date control transferred under ASC 606 for each deal. Management's assertion is not a verified fact.</li>
+                        <li><strong>Return rights and acceptance clauses:</strong> Any deal with acceptance provisions or extended return windows may not qualify for Q4 recognition.</li>
+                        <li><strong>Q1 reversals:</strong> Ask internal audit to pull early Q1 credit memos. Channel stuffing typically shows up in subsequent-period reversals.</li>
+                    </ol>
+                    <p>The SEC consistently flags quarter-end revenue spikes as a fraud indicator. Under Armour's $408M SEC settlement involved exactly this pattern.</p>`,
+            sources: ['Q4 Financial Statements, p. 8', 'Q4 Revenue Analysis Deck, p. 4', 'Internal Controls Assessment, p. 16']
+        },
+        Risk: {
+            question: 'The ERM dashboard shows three risks currently rated above board-approved appetite thresholds. What is the status of mitigation plans for each, and have any risk owners or timelines changed since the Q3 board meeting?',
+            responseHtml: `<p>Three risks above board-approved appetite is a governance failure that requires direct board attention — not just a management status update. Here's what to probe:</p>
+                    <p><strong>What the board needs to understand:</strong></p>
+                    <ol>
+                        <li><strong>Escalation accountability:</strong> How many quarters have these three risks been above appetite without board-level escalation? The obligation to surface breaches rests with management — who owns that?</li>
+                        <li><strong>Mitigation plan specifics:</strong> Request the risk owner for each, the committed remediation timeline, and the metric that will confirm the risk is back within appetite.</li>
+                        <li><strong>Cascading scenarios:</strong> Supplier concentration, cyber incident response, and customer concentration are potentially interconnected. A supply disruption could accelerate customer losses. Has management modeled second-order effects?</li>
+                        <li><strong>Appetite recalibration:</strong> If near-term mitigation isn't feasible, the board should consciously decide whether the appetite statement needs revision — that's a board decision, not a management default.</li>
+                    </ol>
+                    <p>SVB's collapse illustrated exactly this failure: concentration risks above appetite, acknowledged in risk registers, with perpetually overdue mitigation plans.</p>`,
+            sources: ['Risk Register & Heat Map, p. 7', 'Q3 Board Meeting Minutes', 'ERM Dashboard Q4 2025']
+        },
+        Cyber: {
+            question: 'Of the 8 ERP users identified with conflicting access roles in the SOX assessment, how many have been remediated, and what compensating controls are in place for those that remain? When is full remediation expected?',
+            responseHtml: `<p>Segregation of duties violations in a newly implemented ERP are among the highest-risk IT control findings an audit committee can encounter. The second consecutive quarter without remediation is the most serious concern. Here's what to probe:</p>
+                    <p><strong>Why this matters beyond compliance:</strong></p>
+                    <ol>
+                        <li><strong>Fraud exposure:</strong> Each of the 8 users with both initiation and approval rights represents an unmitigated fraud pathway — fictitious transactions, unauthorized payments, or concealed errors.</li>
+                        <li><strong>Compensating controls specifics:</strong> Management will reference compensating controls. Ask precisely what they are — enhanced monitoring, supervisor review? Assess whether they actually close the gap.</li>
+                        <li><strong>No access reviews since go-live:</strong> Six months without a provisioning review means the current access profile may be significantly worse than when the finding was first identified. Request a current access report.</li>
+                        <li><strong>Remediation deadline:</strong> Get a specific date, not "in progress." Two consecutive quarters suggests this isn't being prioritized — direct board attention typically accelerates resolution.</li>
+                    </ol>
+                    <p>Multiple high-profile fraud cases — including Wirecard — involved ERP access control failures where SOD violations went unremediated for quarters.</p>`,
+            sources: ['Internal Controls Assessment, p. 22–24', 'IT SOX Testing Results', 'ERP Access Report Q4 2025']
+        }
+    };
 
-    if (question) {
-        document.getElementById('userQuestion').textContent = question;
+    const sourceIconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+
+    // Read URL params
+    const params = new URLSearchParams(window.location.search);
+    let currentExpert = params.get('expert') || 'Audit';
+    const hasQuestion = !!params.get('expert'); // came from home page
+
+    // Show messages or empty state
+    if (hasQuestion) {
         document.getElementById('msgUserWrapper').style.display = '';
+        document.querySelector('.msg-ai').style.display = '';
         document.getElementById('emptyState').style.display = 'none';
     } else {
         document.getElementById('msgUserWrapper').style.display = 'none';
@@ -625,16 +667,41 @@
 
     function setExpert(expertKey) {
         currentExpert = expertKey;
-        const labels = { Audit: 'AI Audit Expert', Risk: 'AI Risk Expert', Cyber: 'AI Cyber Expert' };
+        const labels = { Audit: 'AI Audit Expert', Risk: 'AI Enterprise Risk Expert', Cyber: 'AI Cyber Expert' };
         const subtitles = {
             Audit: 'Ask your Audit Expert anything about the board materials, risk flags, or financial disclosures.',
-            Risk: 'Ask your Risk Expert about risk patterns, exposure levels, or mitigation strategies.',
+            Risk: 'Ask your Enterprise Risk Expert about risk appetite, exposure levels, or mitigation strategies.',
             Cyber: 'Ask your Cyber Expert about IT controls, access management, or cybersecurity governance.'
         };
-        document.getElementById('expertLabel').textContent = labels[expertKey] || 'AI Risk Expert';
-        document.getElementById('titleBtn').childNodes[0].textContent = `GovernAI Agent — ${expertKey} `;
+        const placeholders = {
+            Audit: 'Ask the Audit Expert about financial statements, controls, or fraud indicators…',
+            Risk: 'Ask the Enterprise Risk Expert about risk appetite, exposure, or mitigation strategies…',
+            Cyber: 'Ask the Cyber Expert about IT controls, access management, or cybersecurity governance…'
+        };
+
+        const label = labels[expertKey] || 'AI Audit Expert';
+        document.getElementById('expertLabel').textContent = label;
+        document.getElementById('titleBtn').childNodes[0].textContent = label + ' ';
+        const emptyTitle = document.getElementById('emptyTitle');
+        if (emptyTitle) emptyTitle.textContent = label;
         const sub = document.getElementById('emptySubtitle');
         if (sub) sub.textContent = subtitles[expertKey] || subtitles.Audit;
+        const field = document.getElementById('inputField');
+        if (field) field.placeholder = placeholders[expertKey] || placeholders.Audit;
+
+        // Swap Q&A content to match the selected expert
+        const content = expertContent[expertKey];
+        if (content) {
+            document.getElementById('userQuestion').textContent = content.question;
+            document.getElementById('aiResponseContent').innerHTML = content.responseHtml;
+            document.getElementById('sourcesChips').innerHTML = content.sources
+                .map(s => `<div class="source-chip">${sourceIconSvg}${s}</div>`).join('');
+            // Show messages when expert is switched
+            document.getElementById('msgUserWrapper').style.display = '';
+            document.querySelector('.msg-ai').style.display = '';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
         document.querySelectorAll('.title-dropdown-item').forEach(item => {
             item.classList.toggle('active', item.dataset.expert === expertKey);
         });

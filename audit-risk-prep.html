@@ -675,7 +675,7 @@
     <!-- Page Header -->
     <div class="page-header">
         <div>
-            <h1 class="page-title">Audit & Risk Prep — Q4 2025</h1>
+            <h1 class="page-title">Smart Prep: Audit, Risk and Cyber</h1>
             <p class="page-subtitle">Audit Committee Meeting · February 18, 2026 at 2:00 PM ET</p>
         </div>
         <button class="btn-primary">View Full Report</button>
@@ -689,29 +689,6 @@
         <div class="tab">Notes</div>
     </div>
 
-    <!-- Risk Summary Cards -->
-    <div class="risk-cards">
-        <div class="risk-card">
-            <div class="risk-card-label">Financial Risks</div>
-            <div class="risk-card-value red">7</div>
-            <div class="risk-card-detail">3 critical, 4 high</div>
-        </div>
-        <div class="risk-card">
-            <div class="risk-card-label">Operational Risks</div>
-            <div class="risk-card-value red">5</div>
-            <div class="risk-card-detail">1 critical, 2 high, 2 medium</div>
-        </div>
-        <div class="risk-card">
-            <div class="risk-card-label">Compliance Flags</div>
-            <div class="risk-card-value">3</div>
-            <div class="risk-card-detail">3 high, 1 medium</div>
-        </div>
-        <div class="risk-card">
-            <div class="risk-card-label">Fraud Indicators</div>
-            <div class="risk-card-value">2</div>
-            <div class="risk-card-detail">Both critical · Escalated</div>
-        </div>
-    </div>
 
     <!-- AI Prep Assistant -->
     <div class="ai-card">
@@ -724,23 +701,23 @@
         </div>
 
         <div class="suggested-questions">
-            <div class="suggested-q">
-                <div class="expert-tag audit">Audit Expert</div>
+            <div class="suggested-q" data-expert="Audit">
+                <div class="expert-tag audit">AI Audit Expert</div>
                 Why did revenue recognition in the final two weeks of Q4 reach 23% of quarterly revenue when the 3-year historical norm is 8–10%? Can management provide signed contracts and delivery confirmations for the five largest Q4 deals?
                 <div style="margin-top:8px; font-size:12px; color:#aaa;">Source: Q4 2025 Financial Statements, p. 8 · Q4 Revenue Analysis Deck, p. 4</div>
             </div>
-            <div class="suggested-q">
-                <div class="expert-tag audit">Audit Expert</div>
+            <div class="suggested-q" data-expert="Audit">
+                <div class="expert-tag audit">AI Audit Expert</div>
                 What is the nature of the Vortex Partners relationship disclosed in footnote 14, and why has this relationship not been identified as a related party transaction in any prior quarterly filing?
                 <div style="margin-top:8px; font-size:12px; color:#aaa;">Source: 10-K Draft, p. 42 · D&O Questionnaire Responses</div>
             </div>
-            <div class="suggested-q">
-                <div class="expert-tag risk">Enterprise Risk Expert</div>
+            <div class="suggested-q" data-expert="Risk">
+                <div class="expert-tag risk">AI Enterprise Risk Expert</div>
                 The ERM dashboard shows three risks currently rated above board-approved appetite thresholds. What is the status of mitigation plans for each, and have any risk owners or timelines changed since the Q3 board meeting?
                 <div style="margin-top:8px; font-size:12px; color:#aaa;">Source: Risk Register & Heat Map, p. 7 · Q3 Board Minutes</div>
             </div>
-            <div class="suggested-q">
-                <div class="expert-tag cyber">Cyber Expert</div>
+            <div class="suggested-q" data-expert="Cyber">
+                <div class="expert-tag cyber">AI Cyber Expert</div>
                 Of the 8 ERP users identified with conflicting access roles in the SOX assessment, how many have been remediated, and what compensating controls are in place for those that remain? When is full remediation expected?
                 <div style="margin-top:8px; font-size:12px; color:#aaa;">Source: Internal Controls Assessment, p. 22 · IT SOX Testing Results</div>
             </div>
@@ -753,17 +730,17 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="consult-dropdown" id="consultDropdown">
-                <div class="consult-dropdown-item" style="border-left: 3px solid #2563EB;">
+                <div class="consult-dropdown-item" data-expert="Audit" style="border-left: 3px solid #2563EB;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    Audit Expert
+                    AI Audit Expert
                 </div>
-                <div class="consult-dropdown-item" style="border-left: 3px solid #C2410C;">
+                <div class="consult-dropdown-item" data-expert="Risk" style="border-left: 3px solid #C2410C;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                    Enterprise Risk Expert
+                    AI Enterprise Risk Expert
                 </div>
-                <div class="consult-dropdown-item" style="border-left: 3px solid #6D28D9;">
+                <div class="consult-dropdown-item" data-expert="Cyber" style="border-left: 3px solid #6D28D9;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Cyber Expert
+                    AI Cyber Expert
                 </div>
             </div>
         </div>
@@ -792,7 +769,7 @@
             </div>
             <div class="flagged-item-desc">23% of Q4 revenue recognized in the final two weeks — nearly 3x the 3-year historical norm of 8–10%. Controls over contract modification accounting under ASC 606 are not operating effectively: 3 of 10 sampled modifications lacked proper approval, 2 had incorrect revenue allocation totaling $2.4M. Pattern is consistent with quarter-end channel stuffing.</div>
             <div class="flagged-item-meta">
-                <span class="expert-tag audit" style="margin-bottom:0;">Audit Expert</span>
+                <span class="expert-tag audit" style="margin-bottom:0;">AI Audit Expert</span>
                 <span class="category-tag">Financial Risk</span>
                 <span class="meta-tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -818,7 +795,7 @@
             </div>
             <div class="flagged-item-desc">Footnote 14 discloses $3.8M in payments to Vortex Partners for "consulting services" in Q4. Cross-referencing D&O questionnaires reveals a board member's immediate family member has an ownership interest in Vortex. This relationship was not disclosed as a related party transaction in any prior quarterly filing. External auditors have flagged this for additional procedures.</div>
             <div class="flagged-item-meta">
-                <span class="expert-tag audit" style="margin-bottom:0;">Audit Expert</span>
+                <span class="expert-tag audit" style="margin-bottom:0;">AI Audit Expert</span>
                 <span class="category-tag">Fraud Indicator</span>
                 <span class="meta-tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -840,7 +817,7 @@
             </div>
             <div class="flagged-item-desc">The Q4 risk register shows three risks rated 'above appetite': (1) Asia-Pacific supplier concentration — single vendor accounts for 34% of critical component supply with no qualified alternative; (2) Cybersecurity incident response — last tabletop exercise was 14 months ago, exceeding the 12-month policy; (3) Customer revenue concentration — top customer represents 21% of annual revenue with contract renewal due in 5 months. Mitigation plans for all three are overdue per Q3 board commitments.</div>
             <div class="flagged-item-meta">
-                <span class="expert-tag risk" style="margin-bottom:0;">Enterprise Risk Expert</span>
+                <span class="expert-tag risk" style="margin-bottom:0;">AI Enterprise Risk Expert</span>
                 <span class="category-tag">Operational Risk</span>
                 <span class="meta-tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -862,7 +839,7 @@
             </div>
             <div class="flagged-item-desc">Segregation of duties violations identified in new ERP implementation. 8 users have conflicting access roles permitting both transaction initiation and approval — creating an unmitigated fraud risk. No user provisioning reviews have been conducted since go-live 6 months ago. This is the second consecutive quarter this finding has been reported without remediation.</div>
             <div class="flagged-item-meta">
-                <span class="expert-tag cyber" style="margin-bottom:0;">Cyber Expert</span>
+                <span class="expert-tag cyber" style="margin-bottom:0;">AI Cyber Expert</span>
                 <span class="category-tag">Compliance Flag</span>
                 <span class="meta-tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -904,15 +881,16 @@
     // Dropdown item navigation
     document.querySelectorAll('.consult-dropdown-item').forEach(item => {
         item.addEventListener('click', () => {
-            const expert = item.textContent.trim();
+            const expert = item.dataset.expert || 'Audit';
             window.location.href = `audit-risk-chat.html?expert=${encodeURIComponent(expert)}`;
         });
     });
 
-    // Suggested question navigation
+    // Suggested question navigation — pass expert key so chat shows matching Q&A
     document.querySelectorAll('.suggested-q').forEach(q => {
         q.addEventListener('click', () => {
-            window.location.href = `audit-risk-chat.html?q=${encodeURIComponent(q.textContent.trim())}`;
+            const expert = q.dataset.expert || 'Audit';
+            window.location.href = `audit-risk-chat.html?expert=${encodeURIComponent(expert)}`;
         });
     });
 </script>
